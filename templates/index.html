@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+   <title>Health</title>
+</head>
+<body>
+   <form onsubmit="send(event)">
+      
+      <p>Enter Age:</p>
+      <p><input id="Age" type = "text" name = "Age" value="52" required/></p>
+      <p>Enter Gender(M=1,F=0):</p>
+      <p><input id="Gender" type = "text" name = "Gender" value="0" required/></p>
+      <p>Enter Bodymass:</p>
+      <p><input id="Bodymass" type = "text" name = "Bodymass" value="20" required/></p>
+      <p>Enter Systolic BP:</p>
+      <p><input id="SBP" type = "text" name = "SBP" value="115" required/></p>
+      <p>Enter Diastolic BP:</p>
+      <p><input id="DBP" type = "text" name = "DBP" value="82" required/></p>
+      <p>Enter BodyTemp:</p>
+      <p><input id="BodyTemp" type = "text" name = "BodyTemp" value="37" required/></p>
+      <p>Enter Glucose:</p>
+      <p><input id="Glucose" type = "text" name = "Glucose" value="90" required/></p>
+      <p>Enter Heart Rate:</p>
+      <p><input id="HeartRate" type = "text" name = "HeartRate" value="94" required/></p>      
+      <p>Enter RestECG level(0,1,2):</p>
+      <p><input id="restecg" type = "text" name = "restecg" value="0" required/></p>
+
+      <p><button>send</button></p>
+   </form>
+   
+   <div id="result">
+   </div>
+   
+</body>
+
+<script>
+
+   function send(e){
+      e.preventDefault()
+      var data = {
+         Age:$("#Age").val(),
+         Gender:$("#Gender").val(),
+         Bodymass:$("#Bodymass").val(),
+         SBP:$("#SBP").val(),
+         BodyTemp:$("#BodyTemp").val(),
+         Glucose:$("#Glucose").val(),
+         HeartRate:$("#HeartRate").val(),
+         DBP:$("#DBP").val(),
+         restecg:$("#restecg").val(),
+         pra:"0",
+         cp:"1",
+         fbs:"0",
+         d:"2.288"
+      }
+   
+
+   
+      $.ajax({
+         type: "POST",
+         url: "/sendData",
+         contentType: 'application/json',
+         success: function (res) { 
+            res = JSON.parse(res)  
+            var response = "";
+            flag = 1;
+            if(res.heartResult=="1"){
+               flag = 0
+               response = "You have heart disease <br>"
+            }
+            if(res.diabetesResult=="1"){
+               flag = 0
+               response += "You have diabetes disease <br>"
+            }
+           
+            if(parseInt($("#BodyTemp").val())<35||parseInt($("#BodyTemp").val())>37.8)
+            {
+              flag=0
+              response += "Your body temperature is abnormal <br>"
+            }
+            if(parseInt($("#Bodymass").val())<18.5||parseInt($("#Bodymass").val())>25)
+            {
+              flag=0
+              response += (parseInt($("#Bodymass").val())<18.5)? ('You are in the underweight range <br>'): ('You are in the overweight range <br>')
+            }
+//            console.log("38"<"220")
+            if(parseInt($("#SBP").val())<90||parseInt($("#SBP").val())>120)
+            {
+              flag=0
+              response += "Your Blood pressure is abnormal <br>"
+            }
+            if(parseInt($("#Glucose").val())>100)
+            {
+              flag=0
+              response += "Glucose level is abnormal <br>"
+            }
+            if(parseInt($("#HeartRate").val())<60||parseInt($("#HeartRate").val())>100)
+            {
+              flag=0
+              response += "Heart rate is in abnormal range <br>"
+            }
+            
+            if(flag == 1)
+               response = "Healthy person"
+
+            $("#result").html(response)
+         },
+         data: JSON.stringify(data)
+     });
+ 
+   }
+
+</script>
+</html>
